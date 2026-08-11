@@ -29,6 +29,7 @@ export const login = asyncHandler(async (req, res) => {
   });
 
   res.status(200).json({
+    message: "Logged in successfully",
     success: true,
     accessToken,
     refreshToken,

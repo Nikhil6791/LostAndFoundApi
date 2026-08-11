@@ -21,3 +21,32 @@ export const createLostItemService = async (data, file, adminId) => {
 
   return lostItem;
 };
+
+export const getAllLostItemsService = async () => {
+  return await prisma.lostItem.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getLostItemByIdService = async (id) => {
+
+    return await prisma.lostItem.findUnique({
+        where: {
+            id,
+        },
+    });
+
+};
+
+export const updateLostItemService = async (id, data) => {
+
+    return await prisma.lostItem.update({
+        where: {
+            id,
+        },
+        data,
+    });
+
+};

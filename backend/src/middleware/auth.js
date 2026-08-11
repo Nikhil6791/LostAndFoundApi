@@ -18,8 +18,8 @@ const authenticate = async (req, res, next) => {
         message: "Access Token Missing",
       });
     }
-    console.log("SECRET:", process.env.JWT_ACCESS_TOKEN_SECRET);
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_TOKEN_SECRET);
+    console.log("SECRET:", process.env.JWT_ACCESS_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
     const admin = await prisma.admin.findUnique({
       where: {

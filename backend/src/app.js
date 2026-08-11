@@ -7,8 +7,8 @@ import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import lostRoutes from "./modules/lost/lost.routes.js";
 const app = express();
-console.log("Access:", process.env.JWT_ACCESS_TOKEN_SECRET);
-console.log("Refresh:", process.env.JWT_REFRESH_TOKEN_SECRET);
+console.log("Access:", process.env.JWT_ACCESS_SECRET);
+console.log("Refresh:", process.env.JWT_REFRESH_SECRET);
 app.use(cors());
 
 app.use(helmet());

@@ -1,6 +1,11 @@
 import prisma from "../../config/prisma.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
 
+
+import  cloudinary  from "../../config/cloudinary.js";
+
+
+
 export const createLostItemService = async (data, file, adminId) => {
   const uploadResult = await uploadToCloudinary(file.buffer, "lost-items");
 
@@ -49,4 +54,31 @@ export const updateLostItemService = async (id, data) => {
         data,
     });
 
+};
+
+
+
+export const deleteLostItemService = async (id) => {
+
+    const lostItem = await prisma.lostItem.findUnique({
+        where: { id }
+    });
+
+    if (!lostItem) {
+        throw new Error("Lost item not found");
+    }
+
+    console.log("Public ID:", lostItem.imagePublicId);
+
+    const result = await cloudinary.uploader.destroy(
+        lostItem.imagePublicId
+    );
+
+    console.log("Cloudinary Result:", result);
+
+    const deletedItem = await prisma.lostItem.delete({
+        where: { id }
+    });
+
+    return deletedItem;
 };

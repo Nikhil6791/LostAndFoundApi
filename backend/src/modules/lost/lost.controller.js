@@ -3,6 +3,9 @@ import { createLostItemService } from "./lost.service.js";
 import { getAllLostItemsService } from "./lost.service.js";
 import { getLostItemByIdService } from "./lost.service.js";
 import { updateLostItemService } from "./lost.service.js";
+import {
+    deleteLostItemService
+} from "./lost.service.js";
 
 export const createLostItem = asyncHandler(async (req, res) => {
   if (!req.file) {
@@ -87,6 +90,19 @@ export const updateLostItem = asyncHandler(async (req, res) => {
         success: true,
         message: "Lost item updated successfully",
         data: updatedItem,
+    });
+
+});
+
+export const deleteLostItem = asyncHandler(async (req, res) => {
+
+    const { id } = req.params;
+
+    await deleteLostItemService(id);
+
+    res.status(200).json({
+        success: true,
+        message: "Lost item deleted successfully"
     });
 
 });

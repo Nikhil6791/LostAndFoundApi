@@ -22,16 +22,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(morgan("dev"));
-app.use(errorHandler);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/lost", lostRoutes);
 app.use("/api/found", foundRoutes);
 
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "Lost & Found API Running 🚀",
-  });
-});
-
+app.use(errorHandler);
 export default app;

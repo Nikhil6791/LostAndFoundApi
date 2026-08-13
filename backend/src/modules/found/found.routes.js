@@ -2,6 +2,10 @@ import express from "express";
 import { createFoundItem, getAllFoundItems } from "./found.controller.js";
 import authenticate from "../../middleware/auth.js";
 import upload from "../../middleware/upload.js";
+import {
+    getFoundItemById,
+    updateFoundItem,
+} from "./found.controller.js";
 
 console.log("🔥 FOUND ROUTES FILE LOADED");
 
@@ -17,6 +21,13 @@ router.get("/test", (req, res) => {
 });
 
 router.get("/", getAllFoundItems);
+router.get("/:id", getFoundItemById);
+router.put(
+    "/:id",
+    authenticate,
+    upload.single("image"),
+    updateFoundItem
+);
 
 router.post("/", authenticate, upload.single("image"), createFoundItem);
 

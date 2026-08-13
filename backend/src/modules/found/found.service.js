@@ -15,3 +15,21 @@ export const getAllFoundItemsService = async () => {
     },
   });
 };
+
+
+export const getFoundItemByIdService = async (id) => {
+    return await prisma.foundItem.findUnique({
+        where: {
+            id,
+        },
+    });
+};
+
+export const updateFoundItemService = async (id, data) => {
+    return await prisma.foundItem.update({
+        where: {
+            id,
+        },
+        data,
+    });
+};

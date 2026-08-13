@@ -17,8 +17,7 @@ const router = express.Router();
 router.get("/", getAllLostItems);
 router.get("/:id", getLostItemById);
 router.post(
-  "/",
-  authenticate,
+  "/report",
   upload.single("image"),
   createLostItemValidation,
   validate,

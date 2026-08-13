@@ -1,27 +1,27 @@
 import { body } from "express-validator";
 
 export const createLostItemValidation = [
-  body("title")
+  body("reporterName")
     .trim()
     .notEmpty()
-    .withMessage("Title is required"),
+    .withMessage("Reporter name is required"),
 
-  body("description")
+  body("phone")
     .trim()
     .notEmpty()
-    .withMessage("Description is required"),
+    .withMessage("Phone number is required")
+    .isMobilePhone("en-IN")
+    .withMessage("Enter a valid phone number"),
 
-  body("category")
-    .trim()
-    .notEmpty()
-    .withMessage("Category is required"),
+  body("email").optional().isEmail().withMessage("Enter a valid email"),
 
-  body("locationLost")
-    .trim()
-    .notEmpty()
-    .withMessage("Location is required"),
+  body("title").trim().notEmpty().withMessage("Title is required"),
 
-  body("dateLost")
-    .notEmpty()
-    .withMessage("Date is required"),
+  body("description").trim().notEmpty().withMessage("Description is required"),
+
+  body("category").trim().notEmpty().withMessage("Category is required"),
+
+  body("locationLost").trim().notEmpty().withMessage("Location is required"),
+
+  body("dateLost").notEmpty().withMessage("Date is required"),
 ];

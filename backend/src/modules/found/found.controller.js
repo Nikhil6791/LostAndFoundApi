@@ -7,6 +7,8 @@ import {
     updateFoundItemService,
 } from "./found.service.js";
 import cloudinary from "../../config/cloudinary.js";
+import { deleteFoundItemService } from "./found.service.js";
+
 export const createFoundItem = asyncHandler(async (req, res) => {
   if (!req.file) {
     return res.status(400).json({
@@ -117,6 +119,19 @@ export const updateFoundItem = asyncHandler(async (req, res) => {
         success: true,
         message: "Found item updated successfully",
         data: updatedItem,
+    });
+
+});
+
+export const deleteFoundItem = asyncHandler(async (req, res) => {
+
+    const { id } = req.params;
+
+    await deleteFoundItemService(id);
+
+    res.status(200).json({
+        success: true,
+        message: "Found item deleted successfully",
     });
 
 });

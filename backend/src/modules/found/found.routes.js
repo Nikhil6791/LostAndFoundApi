@@ -6,6 +6,7 @@ import {
     getFoundItemById,
     updateFoundItem,
 } from "./found.controller.js";
+import { deleteFoundItem } from "./found.controller.js";
 
 console.log("🔥 FOUND ROUTES FILE LOADED");
 
@@ -29,6 +30,11 @@ router.put(
     updateFoundItem
 );
 
+router.delete(
+    "/:id",
+    authenticate,
+    deleteFoundItem
+);
 router.post("/", authenticate, upload.single("image"), createFoundItem);
 
 export default router;

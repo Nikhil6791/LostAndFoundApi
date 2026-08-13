@@ -14,45 +14,97 @@ model Admin {
   password  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  lostItems LostItem[]
+
 }
 
 model LostItem {
   id            String     @id @default(cuid())
+
+  reporterName  String
+  phone         String
+  email         String?
+
   title         String
   description   String
   category      String
   locationLost  String
   dateLost      DateTime
+
   imageUrl      String
   imagePublicId String
-  status        ItemStatus @default(LOST)
-  createdBy     String
+
+  status        LostStatus @default(ACTIVE)
+
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-  admin         Admin      @relation(fields: [createdBy], references: [id])
+
+  @@index([status])
+  @@index([category])
+  @@index([dateLost])
 }
 
 model FoundItem {
-  id            String     @id @default(cuid())
+  id            String      @id @default(cuid())
+
   reporterName  String
   phone         String
   email         String?
+
   title         String
   description   String
   category      String
   locationFound String
   dateFound     DateTime
+
   imageUrl      String
   imagePublicId String
-  status        ItemStatus @default(FOUND)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+
+  status        FoundStatus @default(PENDING)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  claims        Claim[]
+
+  @@index([status])
+  @@index([category])
+  @@index([dateFound])
 }
 
-enum ItemStatus {
-  LOST
-  FOUND
-  MATCHED
+model Claim {
+  id String @id @default(cuid())
+
+  foundItemId String
+  foundItem FoundItem @relation(fields: [foundItemId], references: [id], onDelete: Cascade)
+
+  claimantName String
+  phone String
+  email String?
+
+  proof String
+
+  status ClaimStatus @default(PENDING)
+claimedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([foundItemId])
+}
+
+enum LostStatus {
+  ACTIVE
   RETURNED
+}
+
+enum FoundStatus {
+  PENDING
+  AVAILABLE
+  RETURNED
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

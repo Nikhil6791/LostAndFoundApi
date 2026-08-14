@@ -6,12 +6,6 @@ import { updateLostItemService } from "./lost.service.js";
 import { deleteLostItemService } from "./lost.service.js";
 
 export const createLostItem = asyncHandler(async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({
-      success: false,
-      message: "Image is required",
-    });
-  }
   const [day, month, year] = req.body.dateLost.split("-");
   const dateLost = new Date(`${year}-${month}-${day}`);
   const lostItem = await createLostItemService(

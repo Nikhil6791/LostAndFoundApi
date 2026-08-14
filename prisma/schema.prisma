@@ -30,8 +30,8 @@ model LostItem {
   locationLost  String
   dateLost      DateTime
 
-  imageUrl      String
-  imagePublicId String
+  imageUrl      String?
+  imagePublicId String?
 
   status        LostStatus @default(ACTIVE)
 

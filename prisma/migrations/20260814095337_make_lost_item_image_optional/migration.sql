@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "LostItem" ALTER COLUMN "imageUrl" DROP NOT NULL,
+ALTER COLUMN "imagePublicId" DROP NOT NULL;

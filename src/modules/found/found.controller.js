@@ -58,7 +58,7 @@ export const getFoundItemById = asyncHandler(async (req, res) => {
 
     const item = await getFoundItemByIdService(id);
 
-    if (!item) {
+    if (!item || item.status !== "AVAILABLE") {
         return res.status(404).json({
             success: false,
             message: "Found item not found",

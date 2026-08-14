@@ -1,6 +1,5 @@
 import express from "express";
 
-import authenticate from "../../middleware/auth.js";
 import upload from "../../middleware/upload.js";
 import validate from "../../middleware/validate.js";
 
@@ -23,6 +22,6 @@ router.post(
 );
 
 router.put("/:id", upload.single("image"), updateLostItem);
-router.delete("/:id", authenticate, deleteLostItem);
+router.delete("/:id", deleteLostItem);
 
 export default router;

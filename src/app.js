@@ -11,7 +11,17 @@ import adminFoundRoutes from "./modules/admin/adminFound.routes.js";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      process.env.USER_FRONTEND_URL,
+      process.env.ADMIN_FRONTEND_URL,
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(helmet());
 

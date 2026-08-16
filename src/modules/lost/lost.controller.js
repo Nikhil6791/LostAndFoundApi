@@ -6,8 +6,12 @@ import { updateLostItemService } from "./lost.service.js";
 import { deleteLostItemService } from "./lost.service.js";
 
 export const createLostItem = asyncHandler(async (req, res) => {
-  const [day, month, year] = req.body.dateLost.split("-");
-  const dateLost = new Date(`${year}-${month}-${day}`);
+  const [year, month, day] = req.body.dateLost.split("-");
+
+  const dateLost = new Date(
+    Date.UTC(Number(year), Number(month) - 1, Number(day)),
+  );
+
   const lostItem = await createLostItemService(
     {
       ...req.body,

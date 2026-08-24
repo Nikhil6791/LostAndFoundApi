@@ -1,4 +1,4 @@
-import transporter from "../config/mailer.js";
+import getTransporter from "../config/mailer.js";
 
 const APP_NAME = "Lost & Found";
 
@@ -6,6 +6,7 @@ const sendMail = async ({ to, subject, html }) => {
   if (!to) return;
 
   try {
+    const transporter = await getTransporter();
     await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to,

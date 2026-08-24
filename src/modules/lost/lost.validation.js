@@ -13,7 +13,12 @@ export const createLostItemValidation = [
     .isMobilePhone("en-IN")
     .withMessage("Enter a valid phone number"),
 
-  body("email").optional().isEmail().withMessage("Enter a valid email"),
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Enter a valid email"),
 
   body("title").trim().notEmpty().withMessage("Title is required"),
 

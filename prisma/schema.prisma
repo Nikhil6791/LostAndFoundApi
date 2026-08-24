@@ -22,7 +22,7 @@ model LostItem {
 
   reporterName  String
   phone         String
-  email         String?
+  email         String
 
   title         String
   description   String

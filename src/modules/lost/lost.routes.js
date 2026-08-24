@@ -7,7 +7,6 @@ import { createLostItemValidation } from "./lost.validation.js";
 import { createLostItem } from "./lost.controller.js";
 import { getAllLostItems } from "./lost.controller.js";
 import { getLostItemById } from "./lost.controller.js";
-import { updateLostItem } from "./lost.controller.js";
 import { deleteLostItem } from "./lost.controller.js";
 
 const router = express.Router();
@@ -21,7 +20,6 @@ router.post(
   createLostItem,
 );
 
-router.put("/:id", upload.single("image"), updateLostItem);
 router.delete("/:id", deleteLostItem);
 
 export default router;

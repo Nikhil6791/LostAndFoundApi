@@ -2,6 +2,7 @@ import prisma from "../../config/prisma.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
 
 import cloudinary from "../../config/cloudinary.js";
+import { sendLostReportConfirmationEmail } from "../../services/emailService.js";
 
 export const createLostItemService = async (data, file) => {
   let imageUrl = null;
@@ -13,11 +14,11 @@ export const createLostItemService = async (data, file) => {
     imagePublicId = uploadResult.public_id;
   }
 
-  return await prisma.lostItem.create({
+  const lostItem = await prisma.lostItem.create({
     data: {
       reporterName: data.reporterName,
       phone: data.phone,
-      email: data.email || null,
+      email: data.email,
 
       title: data.title,
       description: data.description,
@@ -29,6 +30,10 @@ export const createLostItemService = async (data, file) => {
       imagePublicId,
     },
   });
+
+  await sendLostReportConfirmationEmail(lostItem);
+
+  return lostItem;
 };
 
 export const getAllLostItemsService = async () => {
@@ -44,15 +49,6 @@ export const getLostItemByIdService = async (id) => {
     where: {
       id,
     },
-  });
-};
-
-export const updateLostItemService = async (id, data) => {
-  return await prisma.lostItem.update({
-    where: {
-      id,
-    },
-    data,
   });
 };
 

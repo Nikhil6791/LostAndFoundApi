@@ -1,14 +1,20 @@
 import prisma from "../../config/prisma.js";
 import cloudinary from "../../config/cloudinary.js";
 import ApiError from "../../utils/ApiError.js";
+import { sendFoundReportConfirmationEmail } from "../../services/emailService.js";
 import {
-  sendFoundReportConfirmationEmail,
-  sendFoundMatchEmail,
-} from "../../services/emailService.js";
+  parsePagination,
+  buildKeywordSearch,
+  buildDateRangeFilter,
+  buildPaginationMeta,
+} from "../../utils/queryHelpers.js";
+import { findAndRecordMatchesForFoundItem } from "../matching/matching.service.js";
+import { generateTrackingId } from "../../utils/trackingId.js";
 
 export const createFoundItemService = async (data) => {
-  const foundItem = await prisma.foundItem.create({
-    data,
+  const foundItem = await prisma.$transaction(async (tx) => {
+    const trackingId = await generateTrackingId(tx);
+    return tx.foundItem.create({ data: { ...data, trackingId } });
   });
 
   await sendFoundReportConfirmationEmail(foundItem);
@@ -16,58 +22,34 @@ export const createFoundItemService = async (data) => {
   return foundItem;
 };
 
-const normalize = (value) => value.trim().toLowerCase();
+export const getAllFoundItemsService = async (query = {}) => {
+  const { search, category, location, date, status } = query;
+  const { page, limit, skip } = parsePagination(query);
 
-const titlesAreSimilar = (titleA, titleB) => {
-  const normalizedA = normalize(titleA);
-  const normalizedB = normalize(titleB);
+  // Default stays AVAILABLE-only so unmoderated PENDING reports are never public;
+  // the validation layer only lets `status` be AVAILABLE or RETURNED anyway.
+  const where = {
+    status: status || "AVAILABLE",
+    ...buildKeywordSearch(search, ["title", "description"]),
+  };
 
-  if (!normalizedA || !normalizedB) return false;
-  if (normalizedA === normalizedB) return true;
-  if (normalizedA.includes(normalizedB) || normalizedB.includes(normalizedA)) {
-    return true;
+  if (category) where.category = { equals: category, mode: "insensitive" };
+  if (location) where.locationFound = { contains: location, mode: "insensitive" };
+
+  if (date) {
+    const dateRange = buildDateRangeFilter(date);
+    if (dateRange) where.dateFound = dateRange;
   }
 
-  const wordsA = new Set(
-    normalizedA.split(/\W+/).filter((word) => word.length > 2)
-  );
-  const wordsB = normalizedB.split(/\W+/).filter((word) => word.length > 2);
+  const findManyArgs = { where, orderBy: { createdAt: "desc" }, skip };
+  if (limit !== null) findManyArgs.take = limit;
 
-  return wordsB.some((word) => wordsA.has(word));
-};
+  const [items, total] = await prisma.$transaction([
+    prisma.foundItem.findMany(findManyArgs),
+    prisma.foundItem.count({ where }),
+  ]);
 
-export const findMatchingLostItemsService = async (foundItem) => {
-  const candidates = await prisma.lostItem.findMany({
-    where: {
-      status: "ACTIVE",
-      category: { equals: foundItem.category, mode: "insensitive" },
-    },
-  });
-
-  return candidates.filter((lostItem) =>
-    titlesAreSimilar(lostItem.title, foundItem.title)
-  );
-};
-
-export const notifyMatchingLostReportersService = async (foundItem) => {
-  const matches = await findMatchingLostItemsService(foundItem);
-
-  await Promise.all(
-    matches.map((lostItem) => sendFoundMatchEmail(lostItem, foundItem))
-  );
-
-  return matches;
-};
-
-export const getAllFoundItemsService = async () => {
-  return await prisma.foundItem.findMany({
-    where: {
-      status: "AVAILABLE",
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  return { items, pagination: buildPaginationMeta(total, page, limit) };
 };
 
 
@@ -140,9 +122,9 @@ export const approveFoundItemService = async (id) => {
     });
 
     try {
-        await notifyMatchingLostReportersService(approvedItem);
+        await findAndRecordMatchesForFoundItem(approvedItem);
     } catch (error) {
-        console.error("Failed to notify matching lost reporters:", error.message);
+        console.error("Failed to run match check for approved found item:", error.message);
     }
 
     return approvedItem;

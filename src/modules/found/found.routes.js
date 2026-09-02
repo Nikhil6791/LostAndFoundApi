@@ -2,7 +2,7 @@ import express from "express";
 import { createFoundItem, getAllFoundItems } from "./found.controller.js";
 import upload from "../../middleware/upload.js";
 import validate from "../../middleware/validate.js";
-import { createFoundItemValidation } from "./found.validation.js";
+import { createFoundItemValidation, getFoundItemsValidation } from "./found.validation.js";
 import { getFoundItemById, updateFoundItem } from "./found.controller.js";
 import { deleteFoundItem } from "./found.controller.js";
 
@@ -15,7 +15,7 @@ router.get("/test", (req, res) => {
   });
 });
 
-router.get("/", getAllFoundItems);
+router.get("/", getFoundItemsValidation, validate, getAllFoundItems);
 router.get("/:id", getFoundItemById);
 router.put("/:id", upload.single("image"), updateFoundItem);
 

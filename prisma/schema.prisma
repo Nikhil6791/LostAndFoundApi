@@ -38,6 +38,12 @@ model LostItem {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
+  // Short public code (e.g. "LF-2026-00124") a reporter can use to check status
+  // without logging in, instead of handing out the internal cuid.
+  trackingId    String     @unique
+
+  matches       Match[]
+
   @@index([status])
   @@index([category])
   @@index([dateLost])
@@ -64,32 +70,45 @@ model FoundItem {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  claims        Claim[]
+  // See LostItem.trackingId — same shared "LF-YYYY-NNNNN" numbering.
+  trackingId    String      @unique
+
+  matches       Match[]
 
   @@index([status])
   @@index([category])
   @@index([dateFound])
 }
 
-model Claim {
+// One row per (lostItem, foundItem) pair that scored 70+ on the matching engine.
+// Storing it (instead of recomputing on every page load) lets us know whether we've
+// already emailed the reporter about this specific pair, and gives the admin panel
+// a "potential matches" list to review without rescanning both tables every time.
+model Match {
   id String @id @default(cuid())
 
+  lostItemId String
+  lostItem   LostItem @relation(fields: [lostItemId], references: [id], onDelete: Cascade)
+
   foundItemId String
-  foundItem FoundItem @relation(fields: [foundItemId], references: [id], onDelete: Cascade)
+  foundItem   FoundItem @relation(fields: [foundItemId], references: [id], onDelete: Cascade)
 
-  claimantName String
-  phone String
-  email String?
+  score      Int
+  notifiedAt DateTime?
 
-  proof String
-
-  status ClaimStatus @default(PENDING)
-claimedAt DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([status])
-  @@index([foundItemId])
+  @@unique([lostItemId, foundItemId])
+  @@index([score])
+}
+
+// One row per calendar year, holding the last tracking number handed out that year.
+// LostItem and FoundItem share this single counter so "LF-2026-00124" is unique
+// across BOTH tables, not just within one of them.
+model TrackingCounter {
+  year  Int @id
+  value Int @default(0)
 }
 
 enum LostStatus {
@@ -101,10 +120,4 @@ enum FoundStatus {
   PENDING
   AVAILABLE
   RETURNED
-}
-
-enum ClaimStatus {
-  PENDING
-  APPROVED
-  REJECTED
 }

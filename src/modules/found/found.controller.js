@@ -43,11 +43,12 @@ export const createFoundItem = asyncHandler(async (req, res) => {
 });
 
 export const getAllFoundItems = asyncHandler(async (req, res) => {
-  const items = await getAllFoundItemsService();
+  const { items, pagination } = await getAllFoundItemsService(req.query);
 
   res.status(200).json({
     success: true,
     count: items.length,
+    pagination,
     data: items,
   });
 });

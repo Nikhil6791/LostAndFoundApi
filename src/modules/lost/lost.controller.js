@@ -27,11 +27,12 @@ export const createLostItem = asyncHandler(async (req, res) => {
 });
 
 export const getAllLostItems = asyncHandler(async (req, res) => {
-  const items = await getAllLostItemsService();
+  const { items, pagination } = await getAllLostItemsService(req.query);
 
   res.status(200).json({
     success: true,
     count: items.length,
+    pagination,
     data: items,
   });
 });

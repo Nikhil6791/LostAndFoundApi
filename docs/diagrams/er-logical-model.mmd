@@ -1,0 +1,63 @@
+erDiagram
+    ADMIN {
+        string id PK
+        string name
+        string email UK
+        string password
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    LOST_ITEM {
+        string id PK
+        string trackingId UK
+        string reporterName
+        string phone
+        string email
+        string title
+        string description
+        string category
+        string locationLost
+        datetime dateLost
+        string imageUrl "nullable"
+        string imagePublicId "nullable"
+        LostStatus status
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    FOUND_ITEM {
+        string id PK
+        string trackingId UK
+        string reporterName
+        string phone
+        string email "nullable"
+        string title
+        string description
+        string category
+        string locationFound
+        datetime dateFound
+        string imageUrl
+        string imagePublicId
+        FoundStatus status
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    MATCH {
+        string id PK
+        string lostItemId FK
+        string foundItemId FK
+        int score
+        datetime notifiedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    TRACKING_COUNTER {
+        int year PK
+        int value
+    }
+
+    LOST_ITEM ||--o{ MATCH : "has potential matches"
+    FOUND_ITEM ||--o{ MATCH : "has potential matches"

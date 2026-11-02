@@ -1,0 +1,96 @@
+classDiagram
+    direction LR
+
+    class PublicReactUI {
+      <<React/Vite application>>
+      +browseLostItems()
+      +browseFoundItems()
+      +reportLostItem()
+      +reportFoundItem()
+      +trackReport()
+      +viewPublicDashboard()
+    }
+
+    class AdminReactUI {
+      <<React/Vite application>>
+      +login()
+      +reviewPendingFoundItems()
+      +approveOrReject()
+      +markReturned()
+      +viewPotentialMatches()
+      +viewDashboard()
+    }
+
+    class ExpressAPI {
+      <<Express application>>
+      +authRoutes
+      +lostRoutes
+      +foundRoutes
+      +trackingRoutes
+      +dashboardRoutes
+      +adminRoutes
+    }
+
+    class AuthService {
+      +login(email, password)
+      +generateToken(admin)
+    }
+    class LostItemService {
+      +createLostItem(data, image)
+      +listLostItems(query)
+      +markReturned(id)
+    }
+    class FoundItemService {
+      +createFoundItem(data)
+      +listFoundItems(query)
+      +approve(id)
+      +reject(id)
+      +markReturned(id)
+    }
+    class MatchingService {
+      +findAndRecordMatchesForLostItem(item)
+      +findAndRecordMatchesForFoundItem(item)
+      +getPotentialMatches(query)
+    }
+    class TrackingService {
+      +trackReport(trackingId)
+    }
+    class DashboardService {
+      +getStats()
+      +getCategories()
+      +getTrends(days)
+      +getRecentActivity(limit)
+    }
+    class PrismaClient {
+      <<ORM>>
+    }
+    class PostgreSQL {
+      <<database>>
+    }
+    class Cloudinary {
+      <<external media service>>
+    }
+    class Brevo {
+      <<external email service>>
+    }
+
+    PublicReactUI --> ExpressAPI : public REST API
+    AdminReactUI --> ExpressAPI : Bearer-token REST API
+    ExpressAPI --> AuthService
+    ExpressAPI --> LostItemService
+    ExpressAPI --> FoundItemService
+    ExpressAPI --> MatchingService
+    ExpressAPI --> TrackingService
+    ExpressAPI --> DashboardService
+    AuthService --> PrismaClient
+    LostItemService --> PrismaClient
+    FoundItemService --> PrismaClient
+    MatchingService --> PrismaClient
+    TrackingService --> PrismaClient
+    DashboardService --> PrismaClient
+    PrismaClient --> PostgreSQL
+    LostItemService --> Cloudinary
+    FoundItemService --> Cloudinary
+    LostItemService --> Brevo
+    FoundItemService --> Brevo
+    MatchingService --> Brevo

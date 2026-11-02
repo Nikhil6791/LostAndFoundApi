@@ -1,0 +1,18 @@
+flowchart LR
+    Reporter["Reporter / Public User"]
+    Admin["Administrator"]
+    System(("Lost & Found System"))
+    Media["Cloudinary\nImage Storage"]
+    Email["Brevo Email Service"]
+
+    Reporter -->|Lost/found report, search, tracking request| System
+    System -->|Listings, report status, tracking ID, match alert| Reporter
+
+    Admin -->|Credentials, moderation and return actions, dashboard request| System
+    System -->|JWT, pending reports, matches, statistics and activity| Admin
+
+    System -->|Upload/delete item image| Media
+    Media -->|Image URL and public ID| System
+
+    System -->|Confirmation and potential-match email| Email
+    Email -->|Delivery result| System

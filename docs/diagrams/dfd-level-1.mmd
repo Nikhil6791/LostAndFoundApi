@@ -1,0 +1,62 @@
+flowchart TB
+    Reporter["Reporter / Public User"]
+    Admin["Administrator"]
+    Cloudinary["Cloudinary"]
+    Brevo["Brevo"]
+
+    P1(("1.0 Receive Lost\nReport"))
+    P2(("2.0 Receive Found\nReport"))
+    P3(("3.0 Browse, Search\nand Track Reports"))
+    P4(("4.0 Authenticate &\nAdminister Reports"))
+    P5(("5.0 Match Reports\nand Notify"))
+    P6(("6.0 Produce Dashboard\nand Activity Data"))
+
+    D1[("D1 Admin")]
+    D2[("D2 Lost Items")]
+    D3[("D3 Found Items")]
+    D4[("D4 Matches")]
+    D5[("D5 Tracking Counter")]
+
+    Reporter -->|Lost report + optional image| P1
+    P1 -->|Create record| D2
+    P1 -->|Increment yearly number| D5
+    P1 -->|Optional image upload| Cloudinary
+    Cloudinary -->|Image URL/public ID| P1
+    P1 -->|New active lost item| P5
+    P1 -->|Confirmation + tracking ID| Brevo
+    Brevo -->|Lost confirmation| Reporter
+
+    Reporter -->|Found report + image| P2
+    P2 -->|Create pending record| D3
+    P2 -->|Increment yearly number| D5
+    P2 -->|Image upload| Cloudinary
+    Cloudinary -->|Image URL/public ID| P2
+    P2 -->|Confirmation + tracking ID| Brevo
+    Brevo -->|Found confirmation| Reporter
+
+    Reporter -->|Listing/search/detail/tracking request| P3
+    P3 <-->|Lost report data| D2
+    P3 <-->|Available found report data| D3
+    P3 <-->|Match history for timeline| D4
+    P3 -->|Listings/details/tracking timeline| Reporter
+
+    Admin -->|Login credentials| P4
+    P4 <-->|Validate admin and issue JWT| D1
+    P4 -->|JWT/session outcome| Admin
+    Admin -->|Approve/reject/return/delete action| P4
+    P4 <-->|Update/read report status| D2
+    P4 <-->|Update/read report status| D3
+    P4 -->|Approved found item| P5
+    P4 -->|Image deletion| Cloudinary
+
+    P5 <-->|Active lost candidates| D2
+    P5 <-->|Available found candidates| D3
+    P5 -->|Store/refresh score and notification time| D4
+    P5 -->|Potential match email| Brevo
+    Brevo -->|Potential match alert| Reporter
+
+    Admin -->|Statistics, trends, activity and matches request| P6
+    P6 <-->|Aggregates and recent reports| D2
+    P6 <-->|Aggregates and recent reports| D3
+    P6 <-->|Potential-match list| D4
+    P6 -->|Dashboard and review data| Admin
